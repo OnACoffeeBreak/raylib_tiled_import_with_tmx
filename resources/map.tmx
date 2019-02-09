@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="64" tileheight="64" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="tilesheet_64x64.tsx"/>
+ <layer id="1" name="background" width="24" height="16">
+  <data encoding="base64" compression="zlib">
+   eJy1k9ENgDAIRLGtNm7hKI7iaB3FURxFSG1CEBVr/bgYa3gcR+0AoBNyTD3AIr9/EfJWd+7RhBsA5kGwQyP/yEnSd9Ef/C97KFmQ2FkKuY+6Z+scxKaM/aGHmV7zsWbzRj6fo8a7lS8zvdoF7dC/5PN7W2qGvKtTL+KP+G7ha1xN8v+IBr6WIwm9rVg/c49RaDTkI+8AY20uP6e7mWr56C1pHlvxa/Q3fwddVBqW
+  </data>
+ </layer>
+ <layer id="2" name="objects" width="24" height="16">
+  <data encoding="base64" compression="zlib">
+   eJzjY2Bg4KMh5mcgHxDSy0+k+bxUNB+bWbw4xClxPwuUZodibHZTGj5AcxWYgTQzhL0Amx2EAD7z2RgYEoDmOoAwB5I4KXZQkn5Gzae++aSmD2qbT0n6xJVPKQHo5lMbgMzHVq5SCwAAvWMFew==
+  </data>
+ </layer>
+</map>
