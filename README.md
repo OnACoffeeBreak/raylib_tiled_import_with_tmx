@@ -16,4 +16,4 @@ Tested in MinGW64 on Windows 10. Steps to build from a virgin Windows 10 install
 1. Clone this repo: ```git clone https://github.com/OnACoffeeBreak/raylib_tiled_import_with_json.git```
 1. ```cd raylib_tiled_import_with_json```
 1. ```mingw32-make```
-1. ```.\raylib_tiled_import.exe```
+1. ```./raylib_tiled_import.exe```
