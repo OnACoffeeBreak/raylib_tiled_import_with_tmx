@@ -17,3 +17,11 @@ Tested in MinGW64 on Windows 10. Steps to build from a virgin Windows 10 install
 1. ```cd raylib_tiled_import_with_json```
 1. ```mingw32-make```
 1. ```./raylib_tiled_import.exe```
+
+# To Do
+
+- [ ] Consider using a CC0 tileset for more engaging map. On the other hand, this will make tiles harder to see.
+- [ ] Test on other platforms. How?
+- [ ] Use a pixel graphics tileset instead of 64x64 and use camera zoom to create the pixel graphics aesthetic.
+- [ ] Add camera boundary detection. Too much for a simple demo?
+- [ ] Integrate into raylib exmples. raysan5 doesn't want examples to depend on large libraries. [raylib_tiled_import_with_json](https://github.com/OnACoffeeBreak/raylib_tiled_import_with_json/) with a single-header JSON lib might be more palatable.
