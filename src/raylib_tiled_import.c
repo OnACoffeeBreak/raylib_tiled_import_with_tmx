@@ -67,6 +67,7 @@ int main()
 
     // De-Initialization
     //--------------------------------------------------------------------------------------   
+    UnloadRenderTexture(mapFrameBuffer);
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
