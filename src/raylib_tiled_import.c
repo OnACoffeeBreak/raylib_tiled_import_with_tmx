@@ -106,6 +106,8 @@ void DrawTmxLayer(tmx_map *map, tmx_layer *layer)
     Rectangle sourceRect;
     Rectangle destRect;
     Texture2D *tsTexture; // tileset texture
+    float rotation = 0.0;
+    Vector2 origin = {0.0, 0.0};
 
     for (row = 0; row < map->height; row++)
     {
@@ -117,7 +119,7 @@ void DrawTmxLayer(tmx_map *map, tmx_layer *layer)
             tile = map->tiles[gid];
             if (tile != NULL)
             {
-                // Get the tileset texture that defines this tile's texture
+                // Get tile's texture out of the tileset texture
                 if (tile->image != NULL)
                 {
                     tsTexture = (Texture2D *)tile->image->resource_image;
@@ -138,31 +140,62 @@ void DrawTmxLayer(tmx_map *map, tmx_layer *layer)
                 destRect.x = col * tile_width;
                 destRect.y = row * tile_height;
 
-                // Deal with flips. From TMX file format documentation:
-                // "When rendering a tile, the order of operation matters. The diagonal flip
-                // (x/y axis swap) is done first, followed by the horizontal and vertical flips."
-                if (flip & TMX_FLIPPED_DIAGONALLY)                
+                // Deal with flips
+                origin.x = 0.0;
+                origin.y = 0.0;
+                rotation = 0.0;
+                switch(flip)
                 {
-                    TraceLog(LOG_INFO, "TODO: Flip GID %d diagonally", gid);
-                    // TODO: How? GetTextureData to get Image and then work on the image?
-                }
-                if (flip & TMX_FLIPPED_HORIZONTALLY)
-                {
-                    sourceRect.height = -1 * sourceRect.height;
-                }
-                if (flip & TMX_FLIPPED_VERTICALLY)
-                {
-                    sourceRect.width = -1 * sourceRect.width;
+                    case TMX_FLIPPED_DIAGONALLY:
+                    {
+                        sourceRect.height = -1 * sourceRect.height;
+                        rotation = 90.0;
+                    } break;
+                    case TMX_FLIPPED_VERTICALLY:
+                    {
+                        sourceRect.height = -1 * sourceRect.height;
+                    } break;
+                    case TMX_FLIPPED_DIAGONALLY + TMX_FLIPPED_VERTICALLY:
+                    {
+                        rotation = -90.0;
+                    } break;
+                    case TMX_FLIPPED_HORIZONTALLY:
+                    {
+                        sourceRect.width = -1 * sourceRect.width;
+                    } break;
+                    case  TMX_FLIPPED_DIAGONALLY + TMX_FLIPPED_HORIZONTALLY:
+                    {
+                        rotation = 90.0;
+                    } break;
+                    case TMX_FLIPPED_HORIZONTALLY + TMX_FLIPPED_VERTICALLY:
+                    {
+                        rotation = 180.0;
+                    } break;
+                    case TMX_FLIPPED_DIAGONALLY + TMX_FLIPPED_HORIZONTALLY + TMX_FLIPPED_VERTICALLY:
+                    {
+                        sourceRect.width = -1 * sourceRect.width;
+                        rotation = 90.0;
+                    } break;
+                    default:
+                    {
+                        origin.x = 0.0;
+                        origin.y = 0.0;
+                        rotation = 0.0;
+                    } break;
                 }
 
-                if (row == 0 && col == 8)
+                // Adjust origin to rotate around the center of the tile, 
+                // which means destination recangle's origin must be adjusted.
+                if (rotation != 0.0)
                 {
-                    TraceLog(LOG_INFO, "GID %d, flip 0x%x, src (%f, %f, %f, %f), dst (%f, %f, %f, %f)",
-                    gid, flip, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height,
-                    destRect.x, destRect.y, destRect.width, destRect.height);
+                    origin.x = tile_width / 2;
+                    origin.y = tile_height / 2;
+                    destRect.x += tile_width / 2;
+                    destRect.y += tile_height / 2;
                 }
+
                 // TODO: Take layer opacity into account
-                DrawTexturePro(*tsTexture, sourceRect, destRect, (Vector2){0.0, 0.0}, 0.0, WHITE);
+                DrawTexturePro(*tsTexture, sourceRect, destRect, origin, rotation, WHITE);
             }
         }
     }
