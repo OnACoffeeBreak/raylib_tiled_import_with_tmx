@@ -23,7 +23,7 @@ void UnloadMapTexture(Texture2D *tex);
 // Read a Tile map editor TMX map file and render the map into RenderTexture2D. 
 // This is the main part of this example.
 // This must be called after InitWindow().
-void RenderTmxMapToFramebuf(const char *mapFIleName, RenderTexture2D *buf);
+void RenderTmxMapToFramebuf(const char *mapFileName, RenderTexture2D *buf);
 
 // Frame buffer into which the map is rendered
 RenderTexture2D mapFrameBuffer;
@@ -33,15 +33,25 @@ int main()
     // Initialization
     //--------------------------------------------------------------------------------------
     int screenWidth = 800;
-    int screenHeight = 450;
+    int screenHeight = 640;
+    Vector2 player;     // This player doesn't have a box or a sprite. It's just a point.
+    Camera2D camera;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera");
-    SetTargetFPS(60);
 
-    // Create a frame buffer
-    mapFrameBuffer = LoadRenderTexture(screenWidth, screenHeight);
     // Load Tiled TMX map and render it to the frame buffer
     RenderTmxMapToFramebuf("resources/map.tmx", &mapFrameBuffer);
+
+    player.x = screenWidth / 2;
+    player.y = screenHeight / 2;
+    camera.target = (Vector2){ player.x, player.y };
+    camera.offset = (Vector2){ 0, 0 };
+    camera.rotation = 0.0;
+    camera.zoom = 1.0;
+
+    TraceLog(LOG_INFO, "%d %d", mapFrameBuffer.texture.width, mapFrameBuffer.texture.height);
+
+    SetTargetFPS(60);
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -49,18 +59,43 @@ int main()
     {
         // Update
         //----------------------------------------------------------------------------------
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+        {
+            player.x += 4;              // Player movement
+            camera.offset.x -= 4;       // Camera displacement with player movement
+        }
+        else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+        {
+            player.x -= 4;              // Player movement
+            camera.offset.x += 4;       // Camera displacement with player movement
+        }
+        else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
+        {
+            player.y -= 4;              // Player movement
+            camera.offset.y -= 4;       // Camera displacement with player movement
+        }
+        else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+        {
+            player.y += 4;              // Player movement
+            camera.offset.y += 4;       // Camera displacement with player movement
+        }
+        // Camera target follows player
+        camera.target = (Vector2){ player.x, player.y };
         //----------------------------------------------------------------------------------
 
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            // Flip along the y axis because OpenGL origin is at bottom left corner while Raylib is top left
-            DrawTextureRec(
-                mapFrameBuffer.texture,                  
-                (Rectangle){0, 0, mapFrameBuffer.texture.width, -mapFrameBuffer.texture.height},
-                (Vector2){0.0, 0.0},
-                WHITE);
+
+            BeginMode2D(camera);
+                // Flip along the y axis because OpenGL origin is at bottom left corner while Raylib is top left
+                DrawTextureRec(
+                    mapFrameBuffer.texture,                  
+                    (Rectangle){0, 0, mapFrameBuffer.texture.width, -mapFrameBuffer.texture.height},
+                    (Vector2){0.0, 0.0},
+                    WHITE);
+            EndMode2D();
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
@@ -201,7 +236,7 @@ void DrawTmxLayer(tmx_map *map, tmx_layer *layer)
     }
 }
 
-void RenderTmxMapToFramebuf(const char *mapFIleName, RenderTexture2D *buf)
+void RenderTmxMapToFramebuf(const char *mapFileName, RenderTexture2D *buf)
 {
     tmx_layer *layer = NULL;
 
@@ -209,11 +244,15 @@ void RenderTmxMapToFramebuf(const char *mapFIleName, RenderTexture2D *buf)
     // set each tile's resource_image property properly.
     tmx_img_load_func = (void *(*)(const char *))LoadMapTexture;
     tmx_img_free_func = (void (*)(void *))UnloadMapTexture;
-    tmx_map *mapTmx = tmx_load(mapFIleName);
+    tmx_map *mapTmx = tmx_load(mapFileName);
     if (mapTmx == NULL) {
         tmx_perror("tmx_load");
         return;
     }
+
+    // Create a frame buffer
+    // TODO: I don't life loading the RenderTexture here and unloading it in main().
+    *buf = LoadRenderTexture(mapTmx->width * mapTmx->tile_width, mapTmx->height * mapTmx->tile_height);
 
     BeginTextureMode(*buf); // start rendering into the buffer
         ClearBackground(SKYBLUE);
@@ -226,9 +265,10 @@ void RenderTmxMapToFramebuf(const char *mapFIleName, RenderTexture2D *buf)
                 switch(layer->type)
                 {
                     case L_LAYER:
+                    {
                         TraceLog(LOG_INFO, "Render TMX layer \"%s\"", layer->name);
                         DrawTmxLayer(mapTmx, layer);
-                        break;
+                    } break;
 
                     // Group, Object and Image layer types are not implemented in this example
                     case L_GROUP:   // deliberate fall-through
