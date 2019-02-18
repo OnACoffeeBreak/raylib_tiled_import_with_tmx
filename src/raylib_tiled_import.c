@@ -251,7 +251,10 @@ void RenderTmxMapToFramebuf(const char *mapFileName, RenderTexture2D *buf)
     }
 
     // Create a frame buffer
-    // TODO: I don't life loading the RenderTexture here and unloading it in main().
+    // TODO: I don't life loading the RenderTexture here and unloading it in main(), but map info is needed to 
+    // allocate the buffer of the right size, so either load it here, or separate tmx_load part of the code into
+    // a separate function to allow the application code to call LoadRenderTexture between tmx_load and actual
+    // drawing of the map.
     *buf = LoadRenderTexture(mapTmx->width * mapTmx->tile_width, mapTmx->height * mapTmx->tile_height);
 
     BeginTextureMode(*buf); // start rendering into the buffer
