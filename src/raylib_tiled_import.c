@@ -49,8 +49,6 @@ int main()
     camera.rotation = 0.0;
     camera.zoom = 1.0;
 
-    TraceLog(LOG_INFO, "%d %d", mapFrameBuffer.texture.width, mapFrameBuffer.texture.height);
-
     SetTargetFPS(60);
     //--------------------------------------------------------------------------------------
 
@@ -71,12 +69,12 @@ int main()
         }
         else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
         {
-            player.y -= 4;              // Player movement
+            player.y += 4;              // Player movement
             camera.offset.y -= 4;       // Camera displacement with player movement
         }
         else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
         {
-            player.y += 4;              // Player movement
+            player.y -= 4;              // Player movement
             camera.offset.y += 4;       // Camera displacement with player movement
         }
         // Camera target follows player
